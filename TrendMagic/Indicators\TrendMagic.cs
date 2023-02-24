@@ -47,6 +47,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 				BullBrush						= Brushes.Lime;
 				BearBrush						= Brushes.Red;
 				AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.Line, Name);
+				AddPlot(Brushes.Transparent, "Trend Output");
+				AddPlot(Brushes.Transparent, "Buy/Sell Output");
 			}
 			else if (State == State.DataLoaded)
 			{
@@ -78,10 +80,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 				else
 					Trend[0] = downTrend;
 				
+			TrendOutput[0] = Trend[0] > Trend[1] ? 1 : Trend[0] < Trend[1] ? -1 : TrendOutput[1];
+			BuySellOutput[0] = TrendOutput[0] == 1 && TrendOutput[1] != 1 ? 1 : TrendOutput[0] == -1 && TrendOutput[1] != -1 ? -1 : 0;
+				
 			if (useCciTrendColor)
 				lineColor[0] = cciVal > 0 ? 1 : -1;
 			else
-				lineColor[0] = Trend[0] > Trend[1] ? 1 : Trend[0] < Trend[1] ? -1 : lineColor[1];
+				lineColor[0] = TrendOutput[0];
 			
 			PlotBrushes[0][0] = lineColor[0] == 1 ? BullBrush : BearBrush;	
 		}
@@ -139,6 +144,20 @@ namespace NinjaTrader.NinjaScript.Indicators
 		public Series<double> Trend
 		{
 			get { return Values[0]; }
+		}
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		public Series<double> TrendOutput
+		{
+			get { return Values[1]; }
+		}
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		public Series<double> BuySellOutput
+		{
+			get { return Values[2]; }
 		}
 		#endregion
 
